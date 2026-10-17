@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nonnita MRZ Camera Test</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f7f5ee;color:#123f37;padding:20px;max-width:700px;margin:auto}
+h1{font-size:25px}
+button{padding:14px 18px;border:0;border-radius:12px;background:#123f37;color:white;font-size:16px;margin:6px 4px 6px 0}
+video{width:100%;background:#222;border-radius:14px;margin-top:12px}
+#status{padding:14px;background:#e8efe8;border-radius:12px;line-height:1.6}
+</style>
+</head>
+<body>
+<h1>Phuket Nonnita</h1>
+<h2>Smart Check-In</h2>
+<p>ทดสอบเปิดกล้องบนแท็บเล็ต</p>
+<video id="video" autoplay playsinline muted></video>
+<br>
+<button id="start">เปิดกล้อง</button>
+<button id="stop">ปิดกล้อง</button>
+<div id="status">กด “เปิดกล้อง” เพื่อเริ่มทดสอบ</div>
+<script>
+const video=document.getElementById('video');
+const status=document.getElementById('status');
+let stream;
+document.getElementById('start').onclick=async()=>{
+  try{
+    if(!navigator.mediaDevices?.getUserMedia){
+      throw new Error('ต้องเปิดหน้าเว็บผ่าน HTTPS จึงจะใช้กล้องได้');
+    }
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'}},audio:false
+    });
+    video.srcObject=stream;
+    status.textContent='เปิดกล้องสำเร็จ! ขั้นต่อไปจะเพิ่มระบบอ่าน MRZ';
+  }catch(e){
+    status.textContent='เปิดกล้องไม่สำเร็จ: '+e.message+
+      ' — ตรวจสอบสิทธิ์กล้องและการเปิดเว็บผ่าน HTTPS';
+  }
+};
+document.getElementById('stop').onclick=()=>{
+  if(stream)stream.getTracks().forEach(t=>t.stop());
+  video.srcObject=null;
+  status.textContent='ปิดกล้องแล้ว';
+};
+</script>
+</body>
+</html>
